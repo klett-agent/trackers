@@ -278,6 +278,49 @@
       select option {
         padding: 10px;
       }
+
+      .btn-test {
+        background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
+        color: white;
+      }
+
+      .btn-test:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(243, 156, 18, 0.3);
+      }
+
+      .test-result {
+        margin-top: 16px;
+        padding: 12px 16px;
+        background: #f0f9ff;
+        border: 2px solid #42bfb0;
+        border-radius: 8px;
+        font-size: 14px;
+        color: #01648d;
+        display: none;
+        animation: slideIn 0.3s ease-out;
+      }
+
+      .test-result.show {
+        display: block;
+      }
+
+      .test-result.error {
+        background: #fff5f5;
+        border-color: #e74c3c;
+        color: #e74c3c;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
     </style>
   </head>
   <body>
@@ -455,15 +498,27 @@
             >
               Cancel
             </button>
+            <button type="button" class="btn btn-test" onclick="testTracker()">
+              🧪 Test
+            </button>
             <button type="submit" class="btn btn-primary">
               Create Tracker
             </button>
           </div>
+          <div id="testResult" class="test-result"></div>
         </form>
       </div>
     </div>
 
     <script>
+      // Configuration
+      const API_CONFIG = {
+        CREATE_URL:
+          "https://klett-agent.app.n8n.cloud/webhook/fb7e29f1-06fd-4c35-a229-cb7f909ea45e",
+        TEST_URL:
+          "https://klett-agent.app.n8n.cloud/webhook/ae6270d5-2927-4c57-9029-fdcc48e37f58",
+      };
+
       const toggleSwitch = document.getElementById("on_off");
       const statusText = document.getElementById("statusText");
       const loadSwitch = document.getElementById("load");
@@ -495,6 +550,66 @@
         chevron.classList.toggle("open");
       }
 
+      // Test tracker configuration
+      async function testTracker() {
+        const testResult = document.getElementById("testResult");
+
+        // Validate URL first
+        const url = document.getElementById("url").value;
+        if (!url) {
+          testResult.className = "test-result show error";
+          testResult.textContent = "❌ Please enter a URL first";
+          return;
+        }
+
+        // Gather form data
+        const formData = {
+          on_off: document.getElementById("on_off").checked,
+          url: document.getElementById("url").value,
+          prompt: document.getElementById("prompt").value,
+          selector: document.getElementById("selector").value,
+          country: document.getElementById("country").value.toUpperCase(),
+          load: document.getElementById("load").checked,
+          proxy: parseInt(document.getElementById("proxy").value),
+          hft: document.getElementById("hft").checked,
+        };
+
+        // Show loading state
+        testResult.className = "test-result show";
+        testResult.textContent = "🔄 Testing tracker configuration...";
+
+        try {
+          const response = await fetch(API_CONFIG.TEST_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            // Assuming the response contains a 'price' field
+            if (data.value) {
+              testResult.className = "test-result show";
+              testResult.innerHTML = `✅ <strong>Test successful!</strong> Price found: <strong>${data.value}</strong>`;
+            } else {
+              testResult.className = "test-result show";
+              testResult.textContent =
+                "✅ Test successful! No price data found.";
+            }
+          } else {
+            testResult.className = "test-result show error";
+            testResult.textContent =
+              "❌ Test failed. Please check your configuration.";
+          }
+        } catch (error) {
+          console.error("Test error:", error);
+          testResult.className = "test-result show error";
+          testResult.textContent = "❌ Failed to connect to test server.";
+        }
+      }
+
       document
         .getElementById("trackerForm")
         .addEventListener("submit", async function (e) {
@@ -512,16 +627,13 @@
           };
 
           try {
-            const response = await fetch(
-              "https://klett-agent.app.n8n.cloud/webhook/fb7e29f1-06fd-4c35-a229-cb7f909ea45e",
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(formData),
+            const response = await fetch(API_CONFIG.CREATE_URL, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
               },
-            );
+              body: JSON.stringify(formData),
+            });
 
             if (response.ok) {
               alert("Tracker created successfully! 🎉");
