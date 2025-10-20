@@ -1,0 +1,753 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>klett.designer - Trackers</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      .header {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        padding: 32px;
+        margin-bottom: 24px;
+      }
+
+      .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      .header-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .header-title h1 {
+        font-size: 32px;
+        background: linear-gradient(135deg, #01648d 0%, #42bfb0 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .header-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .search-box {
+        padding: 12px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        width: 300px;
+        transition: all 0.3s;
+      }
+
+      .search-box:focus {
+        outline: none;
+        border-color: #42bfb0;
+        box-shadow: 0 0 0 3px rgba(66, 191, 176, 0.1);
+      }
+
+      .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #01648d 0%, #42bfb0 100%);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(1, 100, 141, 0.3);
+      }
+
+      .btn-secondary {
+        background: #f5f5f5;
+        color: #333;
+      }
+
+      .btn-secondary:hover {
+        background: #e0e0e0;
+      }
+
+      .btn-danger {
+        background: #e74c3c;
+        color: white;
+      }
+
+      .btn-danger:hover {
+        background: #c0392b;
+      }
+
+      .btn-small {
+        padding: 8px 16px;
+        font-size: 13px;
+      }
+
+      .stats {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        padding: 24px;
+        margin-bottom: 24px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 24px;
+      }
+
+      .stat-item {
+        text-align: center;
+      }
+
+      .stat-value {
+        font-size: 36px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #01648d 0%, #42bfb0 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .stat-label {
+        font-size: 14px;
+        color: #666;
+        margin-top: 4px;
+      }
+
+      .content-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .table-container {
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      thead {
+        background: linear-gradient(135deg, #01648d 0%, #42bfb0 100%);
+      }
+
+      thead th {
+        padding: 16px;
+        text-align: left;
+        font-size: 13px;
+        font-weight: 600;
+        color: white;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      tbody tr {
+        border-bottom: 1px solid #f0f0f0;
+        transition: background-color 0.2s;
+      }
+
+      tbody tr:hover {
+        background-color: #f9f9f9;
+      }
+
+      tbody td {
+        padding: 16px;
+        font-size: 14px;
+        color: #333;
+      }
+
+      .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .status-enabled {
+        background-color: rgba(66, 191, 176, 0.1);
+        color: #01648d;
+      }
+
+      .status-disabled {
+        background-color: rgba(149, 165, 166, 0.1);
+        color: #7f8c8d;
+      }
+
+      .url-cell {
+        max-width: 300px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .url-link {
+        color: #01648d;
+        text-decoration: none;
+      }
+
+      .url-link:hover {
+        text-decoration: underline;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 8px;
+      }
+
+      .icon-btn {
+        padding: 8px;
+        border: none;
+        background: none;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .icon-btn:hover {
+        background-color: #f0f0f0;
+      }
+
+      .icon-btn.edit:hover {
+        background-color: rgba(66, 191, 176, 0.1);
+        color: #01648d;
+      }
+
+      .icon-btn.delete:hover {
+        background-color: rgba(231, 76, 60, 0.1);
+        color: #e74c3c;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 4px 8px;
+        background: rgba(66, 191, 176, 0.1);
+        color: #01648d;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        margin-left: 8px;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        color: #999;
+      }
+
+      .empty-state svg {
+        margin-bottom: 20px;
+        opacity: 0.3;
+      }
+
+      .empty-state h3 {
+        font-size: 20px;
+        color: #666;
+        margin-bottom: 12px;
+      }
+
+      .empty-state p {
+        font-size: 14px;
+        margin-bottom: 24px;
+      }
+
+      .loading {
+        text-align: center;
+        padding: 60px 20px;
+      }
+
+      .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #42bfb0;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal.active {
+        display: flex;
+      }
+
+      .modal-content {
+        background: white;
+        border-radius: 16px;
+        padding: 32px;
+        max-width: 500px;
+        width: 90%;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      }
+
+      .modal-header {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 16px;
+        color: #333;
+      }
+
+      .modal-body {
+        margin-bottom: 24px;
+        color: #666;
+        line-height: 1.6;
+      }
+
+      .modal-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+      }
+
+      @media (max-width: 768px) {
+        .header-content {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .search-box {
+          width: 100%;
+        }
+
+        .stats {
+          grid-template-columns: 1fr;
+        }
+
+        .table-container {
+          overflow-x: scroll;
+        }
+
+        table {
+          min-width: 800px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <div class="header">
+        <div class="header-content">
+          <div class="header-title">
+            <h1>🎯 URL Trackers</h1>
+          </div>
+          <div class="header-actions">
+            <input
+              type="text"
+              id="searchInput"
+              class="search-box"
+              placeholder="Search by URL or prompt..."
+            />
+            <button
+              class="btn btn-secondary btn-small"
+              onclick="loadTrackers()"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path
+                  d="M14 2L6 14L2 10"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              Refresh
+            </button>
+            <a href="tracker.html" class="btn btn-primary btn-small">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path
+                  d="M8 2V14M2 8H14"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+              </svg>
+              Add New
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats">
+        <div class="stat-item">
+          <div class="stat-value" id="totalTrackers">0</div>
+          <div class="stat-label">Total Trackers</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="activeTrackers">0</div>
+          <div class="stat-label">Active</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="hftTrackers">0</div>
+          <div class="stat-label">HFT Enabled</div>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="content-card">
+        <div class="table-container">
+          <div id="loadingState" class="loading">
+            <div class="spinner"></div>
+            <p>Loading trackers...</p>
+          </div>
+
+          <table id="trackersTable" style="display: none">
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>URL</th>
+                <th>Prompt</th>
+                <th>Country</th>
+                <th>HFT</th>
+                <th>Proxy</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="trackersBody"></tbody>
+          </table>
+
+          <div id="emptyState" class="empty-state" style="display: none">
+            <svg
+              width="80"
+              height="80"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <circle cx="12" cy="12" r="10" stroke-width="2" />
+              <line
+                x1="12"
+                y1="8"
+                x2="12"
+                y2="12"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+              <line
+                x1="12"
+                y1="16"
+                x2="12.01"
+                y2="16"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+            <h3>No trackers found</h3>
+            <p>Start by creating your first URL tracker</p>
+            <a href="klett-designer.html" class="btn btn-primary">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path
+                  d="M8 2V14M2 8H14"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+              </svg>
+              Create First Tracker
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">Confirm Delete</div>
+        <div class="modal-body">
+          Are you sure you want to delete this tracker? This action cannot be
+          undone.
+        </div>
+        <div class="modal-actions">
+          <button
+            class="btn btn-secondary btn-small"
+            onclick="closeDeleteModal()"
+          >
+            Cancel
+          </button>
+          <button class="btn btn-danger btn-small" onclick="confirmDelete()">
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Configuration - Replace with your n8n webhook URLs
+      const API_CONFIG = {
+        LIST_URL:
+          "https://klett-agent.app.n8n.cloud/webhook/fb7e29f1-06fd-4c35-a229-cb7f909ea45e",
+        DELETE_URL: "https://your-n8n-instance.com/webhook/delete-tracker",
+      };
+
+      let trackers = [];
+      let deleteTargetId = null;
+
+      // Load trackers on page load
+      document.addEventListener("DOMContentLoaded", function () {
+        loadTrackers();
+
+        // Search functionality
+        document
+          .getElementById("searchInput")
+          .addEventListener("input", function (e) {
+            filterTrackers(e.target.value);
+          });
+      });
+
+      // Load trackers from n8n
+      async function loadTrackers() {
+        const loadingState = document.getElementById("loadingState");
+        const table = document.getElementById("trackersTable");
+        const emptyState = document.getElementById("emptyState");
+
+        loadingState.style.display = "block";
+        table.style.display = "none";
+        emptyState.style.display = "none";
+
+        try {
+          // MOCK DATA - Replace with actual API call
+          const response = await fetch(API_CONFIG.LIST_URL);
+          trackers = await response.json();
+
+          // Mock data for demonstration
+          //  trackers = [
+          //      {
+          //          id: 1,
+          //          on_off: true,
+          //          url: 'https://example.com/product-1',
+          //          prompt: 'Extract the main product price. The price is shown as a number followed by \' zł\'.',
+          //          selector: '.price-value',
+          //          country: 'PL',
+          //          load: false,
+          //          proxy: 0,
+          //          hft: true
+          //      },
+          //      {
+          //          id: 2,
+          //          on_off: false,
+          //          url: 'https://example.com/product-2',
+          //          prompt: 'Track availability and price changes',
+          //          selector: '#product-price',
+          //          country: 'DE',
+          //          load: true,
+          //          proxy: 1,
+          //          hft: false
+          //      }
+          //  ];
+
+          renderTrackers(trackers);
+          updateStats();
+        } catch (error) {
+          console.error("Error loading trackers:", error);
+          alert("Failed to load trackers. Please check console for details.");
+        } finally {
+          loadingState.style.display = "none";
+        }
+      }
+
+      // Render trackers table
+      function renderTrackers(data) {
+        const tbody = document.getElementById("trackersBody");
+        const table = document.getElementById("trackersTable");
+        const emptyState = document.getElementById("emptyState");
+
+        if (data.length === 0) {
+          table.style.display = "none";
+          emptyState.style.display = "block";
+          return;
+        }
+
+        table.style.display = "table";
+        emptyState.style.display = "none";
+
+        tbody.innerHTML = data
+          .map(
+            (tracker) => `
+                <tr>
+                    <td>
+                        <span class="status-badge ${tracker.on_off ? "status-enabled" : "status-disabled"}">
+                            ${tracker.on_off ? "● Enabled" : "○ Disabled"}
+                        </span>
+                    </td>
+                    <td class="url-cell">
+                        <a href="${tracker.url}" target="_blank" class="url-link" title="${tracker.url}">
+                            ${tracker.url}
+                        </a>
+                    </td>
+                    <td style="max-width: 300px;">
+                        <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${tracker.prompt}">
+                            ${tracker.prompt || "-"}
+                        </div>
+                    </td>
+                    <td>${tracker.country || "-"}</td>
+                    <td>
+                        ${tracker.hft ? '<span class="badge">HFT</span>' : "-"}
+                    </td>
+                    <td>${getProxyLabel(tracker.proxy)}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="icon-btn edit" onclick="editTracker(${tracker.id})" title="Edit">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor">
+                                    <path d="M11 2L14 5L5 14H2V11L11 2Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                            <button class="icon-btn delete" onclick="deleteTracker(${tracker.id})" title="Delete">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor">
+                                    <path d="M2 4H14M6 4V2H10V4M3 4V14H13V4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `,
+          )
+          .join("");
+      }
+
+      // Filter trackers based on search
+      function filterTrackers(query) {
+        const filtered = trackers.filter(
+          (tracker) =>
+            tracker.url.toLowerCase().includes(query.toLowerCase()) ||
+            (tracker.prompt &&
+              tracker.prompt.toLowerCase().includes(query.toLowerCase())),
+        );
+        renderTrackers(filtered);
+      }
+
+      // Update statistics
+      function updateStats() {
+        document.getElementById("totalTrackers").textContent = trackers.length;
+        document.getElementById("activeTrackers").textContent = trackers.filter(
+          (t) => t.on_off,
+        ).length;
+        document.getElementById("hftTrackers").textContent = trackers.filter(
+          (t) => t.hft,
+        ).length;
+      }
+
+      // Get proxy label
+      function getProxyLabel(proxyValue) {
+        const labels = {
+          0: "None",
+          1: "Premium",
+          2: "Stealth",
+        };
+        return labels[proxyValue] || "None";
+      }
+
+      // Edit tracker
+      function editTracker(id) {
+        window.location.href = `klett-designer.html?id=${id}`;
+      }
+
+      // Delete tracker
+      function deleteTracker(id) {
+        deleteTargetId = id;
+        document.getElementById("deleteModal").classList.add("active");
+      }
+
+      // Close delete modal
+      function closeDeleteModal() {
+        document.getElementById("deleteModal").classList.remove("active");
+        deleteTargetId = null;
+      }
+
+      // Confirm delete
+      async function confirmDelete() {
+        if (!deleteTargetId) return;
+
+        try {
+          // ACTUAL API CALL - Uncomment when ready
+          // const response = await fetch(`${API_CONFIG.DELETE_URL}/${deleteTargetId}`, {
+          //     method: 'DELETE'
+          // });
+          // if (!response.ok) throw new Error('Delete failed');
+
+          // Remove from local array (mock)
+          trackers = trackers.filter((t) => t.id !== deleteTargetId);
+          renderTrackers(trackers);
+          updateStats();
+
+          closeDeleteModal();
+          alert("Tracker deleted successfully! 🗑️");
+        } catch (error) {
+          console.error("Error deleting tracker:", error);
+          alert("Failed to delete tracker. Please try again.");
+        }
+      }
+    </script>
+  </body>
+</html>

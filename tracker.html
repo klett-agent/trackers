@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>klett.designer</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .container {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        max-width: 600px;
+        width: 100%;
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #01648d 0%, #42bfb0 100%);
+        padding: 32px;
+        color: white;
+      }
+
+      .header h1 {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+
+      .header p {
+        font-size: 14px;
+        opacity: 0.9;
+      }
+
+      .form-content {
+        padding: 32px;
+      }
+
+      .form-group {
+        margin-bottom: 24px;
+      }
+
+      .form-group label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+      }
+
+      .required {
+        color: #e74c3c;
+        margin-left: 4px;
+      }
+
+      .form-group input[type="text"],
+      .form-group input[type="url"],
+      .form-group textarea,
+      .form-group select {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.3s;
+        font-family: inherit;
+      }
+
+      .form-group input[type="text"]:focus,
+      .form-group input[type="url"]:focus,
+      .form-group textarea:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: #42bfb0;
+        box-shadow: 0 0 0 3px rgba(66, 191, 176, 0.1);
+      }
+
+      .form-group textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+
+      .helper-text {
+        font-size: 12px;
+        color: #666;
+        margin-top: 6px;
+      }
+
+      .toggle-switch {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 52px;
+        height: 28px;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: 0.3s;
+        border-radius: 28px;
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 20px;
+        width: 20px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: 0.3s;
+        border-radius: 50%;
+      }
+
+      input:checked + .slider {
+        background-color: #42bfb0;
+      }
+
+      input:checked + .slider:before {
+        transform: translateX(24px);
+      }
+
+      .toggle-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+      }
+
+      .toggle-status {
+        font-size: 12px;
+        color: #666;
+      }
+
+      .divider {
+        height: 1px;
+        background: #e0e0e0;
+        margin: 32px 0;
+      }
+
+      .advanced-section {
+        margin-top: 32px;
+      }
+
+      .advanced-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 20px;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .advanced-header h3 {
+        font-size: 16px;
+        color: #01648d;
+        font-weight: 600;
+      }
+
+      .chevron {
+        transition: transform 0.3s;
+      }
+
+      .chevron.open {
+        transform: rotate(180deg);
+      }
+
+      .advanced-content {
+        display: none;
+        animation: slideDown 0.3s ease-out;
+      }
+
+      .advanced-content.open {
+        display: block;
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .input-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 12px;
+        margin-top: 32px;
+      }
+
+      .btn {
+        flex: 1;
+        padding: 14px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #01648d 0%, #42bfb0 100%);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(1, 100, 141, 0.3);
+      }
+
+      .btn-secondary {
+        background: #f5f5f5;
+        color: #333;
+      }
+
+      .btn-secondary:hover {
+        background: #e0e0e0;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 4px 10px;
+        background: rgba(66, 191, 176, 0.1);
+        color: #01648d;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        margin-left: 8px;
+      }
+
+      select option {
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🎯 Create New URL Tracker</h1>
+        <p>Monitor price drops and changes with AI-powered tracking</p>
+      </div>
+
+      <div class="form-content">
+        <form id="trackerForm">
+          <!-- Tracker Status Toggle -->
+          <div class="form-group">
+            <div class="toggle-switch">
+              <label class="switch">
+                <input type="checkbox" id="on_off" checked />
+                <span class="slider"></span>
+              </label>
+              <div>
+                <div class="toggle-label">Tracker Status</div>
+                <div class="toggle-status" id="statusText">Enabled</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- URL Input -->
+          <div class="form-group">
+            <label for="url">
+              Target URL
+              <span class="required">*</span>
+            </label>
+            <input
+              type="url"
+              id="url"
+              placeholder="https://example.com/product/item-name"
+              required
+            />
+            <div class="helper-text">
+              Enter the full URL of the page you want to track
+            </div>
+          </div>
+
+          <!-- AI Prompt -->
+          <div class="form-group">
+            <label for="prompt">
+              AI Prompt
+              <span class="badge">AI POWERED</span>
+            </label>
+            <textarea
+              id="prompt"
+              placeholder="e.g., Extract the product price."
+            ></textarea>
+            <div class="helper-text">
+              Describe data to extract and how to identify the correct price
+              element on the page
+            </div>
+          </div>
+
+          <!-- Advanced Settings -->
+          <div class="advanced-section">
+            <div class="advanced-header" onclick="toggleAdvanced()">
+              <svg
+                class="chevron"
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+              >
+                <path
+                  d="M4 6L8 10L12 6"
+                  stroke="#01648d"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              <h3>Advanced Settings</h3>
+            </div>
+
+            <div class="advanced-content" id="advancedContent">
+              <!-- CSS Selector -->
+              <div class="form-group">
+                <label for="selector">
+                  Element Selector
+                  <span class="badge">OPTIONAL</span>
+                </label>
+                <input
+                  type="text"
+                  id="selector"
+                  placeholder=".price-value, #product-price, [data-price]"
+                />
+                <div class="helper-text">
+                  CSS selector to help AI focus on specific elements (e.g.,
+                  .price, #price-final, #price > div.final)
+                </div>
+              </div>
+
+              <div class="input-group">
+                <!-- Country Code -->
+                <div class="form-group">
+                  <label for="country">Country Code</label>
+                  <input
+                    type="text"
+                    id="country"
+                    placeholder="PL"
+                    maxlength="2"
+                    style="text-transform: uppercase"
+                  />
+                  <div class="helper-text">e.g., PL, US, DE</div>
+                </div>
+
+                <!-- Load Wait -->
+                <div class="form-group">
+                  <label for="load">Page Load</label>
+                  <div class="toggle-switch">
+                    <label class="switch">
+                      <input type="checkbox" id="load" />
+                      <span class="slider"></span>
+                    </label>
+                    <div>
+                      <div class="toggle-status" id="loadText">Quick load</div>
+                    </div>
+                  </div>
+                  <div class="helper-text">Wait for full page load</div>
+                </div>
+              </div>
+
+              <!-- Proxy Selection -->
+              <div class="form-group">
+                <label for="proxy">Proxy Type</label>
+                <select id="proxy">
+                  <option value="0">🚫 No Proxy (Default)</option>
+                  <option value="1">⚡ Premium Proxy</option>
+                  <option value="2">🥷 Stealth Proxy</option>
+                </select>
+                <div class="helper-text">
+                  Use proxy to avoid rate limiting and IP blocks
+                </div>
+              </div>
+
+              <!-- HFT Mode -->
+              <div class="form-group">
+                <label for="hft">
+                  High-Frequency Tracking (HFT)
+                  <span class="badge">AI POWERED</span>
+                </label>
+                <div class="toggle-switch">
+                  <label class="switch">
+                    <input type="checkbox" id="hft" />
+                    <span class="slider"></span>
+                  </label>
+                  <div>
+                    <div class="toggle-status" id="hftText">
+                      Standard tracking
+                    </div>
+                  </div>
+                </div>
+                <div class="helper-text">
+                  Monitor domains with High-frequency tracking powered by AI
+                  insights to understand pricing behavior and forecast upcoming
+                  price drops
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="button-group">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="window.location.href='index.html'"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">
+              Create Tracker
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const toggleSwitch = document.getElementById("on_off");
+      const statusText = document.getElementById("statusText");
+      const loadSwitch = document.getElementById("load");
+      const loadText = document.getElementById("loadText");
+      const hftSwitch = document.getElementById("hft");
+      const hftText = document.getElementById("hftText");
+
+      toggleSwitch.addEventListener("change", function () {
+        statusText.textContent = this.checked ? "Enabled" : "Disabled";
+        statusText.style.color = this.checked ? "#42bfb0" : "#999";
+      });
+
+      loadSwitch.addEventListener("change", function () {
+        loadText.textContent = this.checked ? "Full page load" : "Quick load";
+      });
+
+      hftSwitch.addEventListener("change", function () {
+        hftText.textContent = this.checked
+          ? "HFT enabled (every 3 hours)"
+          : "Standard tracking";
+        hftText.style.color = this.checked ? "#42bfb0" : "#666";
+      });
+
+      function toggleAdvanced() {
+        const content = document.getElementById("advancedContent");
+        const chevron = document.querySelector(".chevron");
+
+        content.classList.toggle("open");
+        chevron.classList.toggle("open");
+      }
+
+      document
+        .getElementById("trackerForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const formData = {
+            on_off: document.getElementById("on_off").checked,
+            url: document.getElementById("url").value,
+            prompt: document.getElementById("prompt").value,
+            selector: document.getElementById("selector").value,
+            country: document.getElementById("country").value.toUpperCase(),
+            load: document.getElementById("load").checked,
+            proxy: parseInt(document.getElementById("proxy").value),
+            hft: document.getElementById("hft").checked,
+          };
+
+          try {
+            const response = await fetch(
+              "https://klett-agent.app.n8n.cloud/webhook/fb7e29f1-06fd-4c35-a229-cb7f909ea45e",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+              },
+            );
+
+            if (response.ok) {
+              alert("Tracker created successfully! 🎉");
+            } else {
+              alert("Error creating tracker. Please try again.");
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            alert("Failed to connect to server.");
+          }
+        });
+
+      document
+        .getElementById("country")
+        .addEventListener("input", function (e) {
+          e.target.value = e.target.value.toUpperCase();
+        });
+    </script>
+  </body>
+</html>
