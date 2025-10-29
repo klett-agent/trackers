@@ -321,6 +321,90 @@
           transform: translateY(0);
         }
       }
+
+      .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+
+      .loading-overlay.active {
+        display: flex;
+      }
+
+      .loading-content {
+        background: white;
+        border-radius: 16px;
+        padding: 40px;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      }
+
+      .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #42bfb0;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .loading-text {
+        font-size: 16px;
+        color: #333;
+        font-weight: 600;
+      }
+
+      .info-bar {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+        color: white;
+        padding: 16px 24px;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        font-size: 14px;
+        font-weight: 600;
+        z-index: 2000;
+        display: none;
+        align-items: center;
+        gap: 8px;
+        animation: slideDown 0.3s ease-out;
+      }
+
+      .info-bar.show {
+        display: flex;
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateX(-50%) translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+        }
+      }
     </style>
   </head>
   <body>
@@ -510,6 +594,28 @@
       </div>
     </div>
 
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+      <div class="loading-content">
+        <div class="spinner"></div>
+        <div class="loading-text">Creating tracker...</div>
+      </div>
+    </div>
+
+    <!-- Info Bar -->
+    <div id="infoBar" class="info-bar">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path
+          d="M16.667 5L7.5 14.167L3.333 10"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+      <span>Tracker created successfully! Redirecting...</span>
+    </div>
+
     <script>
       // Configuration
       const API_CONFIG = {
@@ -621,6 +727,10 @@
           e.preventDefault();
 
           const formData = getFormData();
+          const loadingOverlay = document.getElementById("loadingOverlay");
+
+          // Show loading spinner
+          loadingOverlay.classList.add("active");
 
           try {
             const response = await fetch(API_CONFIG.CREATE_URL, {
@@ -632,13 +742,23 @@
             });
 
             if (response.ok) {
-              alert("Tracker created successfully! 🎉");
+              // Show success info bar
+              const infoBar = document.getElementById("infoBar");
+              infoBar.classList.add("show");
+
+              // Redirect after 2 seconds
+              setTimeout(() => {
+                window.location.href = "index.html";
+              }, 2000);
             } else {
               alert("Error creating tracker. Please try again.");
             }
           } catch (error) {
             console.error("Error:", error);
             alert("Failed to connect to server.");
+          } finally {
+            // Hide loading spinner
+            loadingOverlay.classList.remove("active");
           }
         });
 
