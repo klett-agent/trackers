@@ -550,6 +550,21 @@
         chevron.classList.toggle("open");
       }
 
+      // Get form data with defaults
+      function getFormData() {
+        return {
+          on_off: document.getElementById("on_off").checked || 0,
+          url: document.getElementById("url").value,
+          prompt: document.getElementById("prompt").value || "Product price",
+          selector: document.getElementById("selector").value || "body",
+          country:
+            document.getElementById("country").value.toUpperCase() || "PL",
+          load: document.getElementById("load").checked || 0,
+          proxy: parseInt(document.getElementById("proxy").value) || 0,
+          hft: document.getElementById("hft").checked || 0,
+        };
+      }
+
       // Test tracker configuration
       async function testTracker() {
         const testResult = document.getElementById("testResult");
@@ -562,17 +577,7 @@
           return;
         }
 
-        // Gather form data
-        const formData = {
-          on_off: document.getElementById("on_off").checked,
-          url: document.getElementById("url").value,
-          prompt: document.getElementById("prompt").value,
-          selector: document.getElementById("selector").value,
-          country: document.getElementById("country").value.toUpperCase(),
-          load: document.getElementById("load").checked,
-          proxy: parseInt(document.getElementById("proxy").value),
-          hft: document.getElementById("hft").checked,
-        };
+        const formData = getFormData();
 
         // Show loading state
         testResult.className = "test-result show";
@@ -615,16 +620,7 @@
         .addEventListener("submit", async function (e) {
           e.preventDefault();
 
-          const formData = {
-            on_off: document.getElementById("on_off").checked,
-            url: document.getElementById("url").value,
-            prompt: document.getElementById("prompt").value,
-            selector: document.getElementById("selector").value,
-            country: document.getElementById("country").value.toUpperCase(),
-            load: document.getElementById("load").checked,
-            proxy: parseInt(document.getElementById("proxy").value),
-            hft: document.getElementById("hft").checked,
-          };
+          const formData = getFormData();
 
           try {
             const response = await fetch(API_CONFIG.CREATE_URL, {
